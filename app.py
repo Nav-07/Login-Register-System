@@ -28,6 +28,22 @@ def user():
     else:
         return jsonify({'message': 'Supplied Credentials had Missing Values.'}), 400
 
+@app.route('/login', methods=['POST'])
+def login():
+    auth = request.authorization
+    if not auth:
+        return jsonify({'message': 'Authotization Not Provided!'}), 400
+    else:
+        username = auth.username
+        password = auth.password
+
+        for user in users_list:
+            if username == user.name and password == user.password:
+                return jsonify({'message': 'Working'}), 200
+            else:
+                return jsonify({'message': 'Username or Password is Invalid'}), 400
+        return jsonify({'message': 'Username or Password is Invalid'}), 400      
+
 # Run the App
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port=50)
