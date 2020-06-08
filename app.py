@@ -3,6 +3,7 @@ import json
 import os
 from User import User
 from Mail import Mail
+from SMS import SMS
 
 # Create Flask Object
 app = Flask(__name__)
@@ -19,11 +20,12 @@ def index():
 @app.route('/user', methods=['POST'])
 def user():
     name = request.json['name']
+    phone = request.json['phone']
     mail = request.json['mail']
     password = request.json['password']
 
     if (mail != '' and name != '' and password != '') :
-        new_user = User(name, mail, password)
+        new_user = User(name, phone, mail, password)
         users_list.append(new_user)
 
         return jsonify(new_user.json()), 201
@@ -41,8 +43,10 @@ def login():
 
         for user in users_list:
             if username == user.name and password == user.password:
-                mail = Mail('navyan.pahwa@gmail.com', 'Login', 'Someone Logged into your account...')
+                mail = Mail(user.mail, 'Login', 'Someone Logged into your account...')
                 mail.send()
+                sms = SMS(user.phone, 'Someone Logged into your account')
+                sms.send()
                 return jsonify({'message': 'Working'}), 200
             else:
                 return jsonify({'message': 'Username or Password is Invalid'}), 400
