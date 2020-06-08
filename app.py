@@ -2,10 +2,12 @@ from flask import Flask, request, jsonify, redirect
 import json
 import os
 from User import User
+from Mail import Mail
 
 # Create Flask Object
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+app.secret_key = os.environ['SECRET_KEY']
 
 users_list = []
 
@@ -28,7 +30,7 @@ def user():
     else:
         return jsonify({'message': 'Supplied Credentials had Missing Values.'}), 400
 
-@app.route('/login', methods=['POST'])
+@app.route('/login')
 def login():
     auth = request.authorization
     if not auth:
@@ -39,6 +41,8 @@ def login():
 
         for user in users_list:
             if username == user.name and password == user.password:
+                mail = Mail('navyan.pahwa@gmail.com', 'Login', 'Someone Logged into your account...')
+                mail.send()
                 return jsonify({'message': 'Working'}), 200
             else:
                 return jsonify({'message': 'Username or Password is Invalid'}), 400
